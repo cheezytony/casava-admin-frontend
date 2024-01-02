@@ -10,9 +10,9 @@ const { signIn, signOut, session, status } = useAuth();
   <div class="grid h-[100dvh] -mt-20 place-items-center">
     <Button
       color-scheme="pink"
-      href="/api/auth/signin"
       left-icon="arrow-right-to-bracket"
       is-rounded
+      @click="signIn"
     >
       Click to sign in
     </Button>
