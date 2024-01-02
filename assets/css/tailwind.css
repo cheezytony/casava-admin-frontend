@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input {
+  --tw-input-background-color: white;
+  --tw-input-border-radius: 4px;
+  --tw-input-font-size: 13px;
+  --tw-input-ring-color: theme(colors.gray.200);
+  --tw-input-ring-width: 1px;
+  --tw-input-padding-x: 1.5rem;
+  --tw-input-padding-y: 14px;
+  --tw-input-width: 100%;
+  background-color: var(--tw-input-background-color);
+  border-radius: var(--tw-input-border-radius);
+  box-shadow: 0 0 0 var(--tw-input-ring-width) var(--tw-input-ring-color);
+  display: block;
+  font-size: var(--tw-input-font-size);
+  height: var(--tw-input-height);
+  padding: var(--tw-input-padding-y) var(--tw-input-padding-x);
+  transition-duration: 300ms;
+  width: var(--tw-input-width);
+}
+.input:autofill {
+  box-shadow:
+    inset 1000px 1000px 1000px var(--tw-input-background-color), 0 0 0 var(--tw-input-ring-width) var(--tw-input-ring-color);
+  font-size: var(--tw-input-font-size);
+}
+.input-rounded, .input {
+  --tw-input-border-radius: 999px;
+}
+
+.input-lg, .input-lg .input {
+  --tw-input-padding-y: 2rem;
+}
+
+.input-sm, .input-lg .input {
+  --tw-input-padding-x: 1rem;
+  --tw-input-padding-y: 0.5rem;
+  --tw-input-width: auto;
+}
+.w-full, .w-full .input {
+  --tw-input-padding-x: 1rem;
+  --tw-input-padding-y: 0.5rem;
+  --tw-input-width: 100%;
+}
+
+.input-textarea {
+  --tw-input-height: 12.5rem;
+}
+
+.input::placeholder {
+  @apply text-gray-400;
+}
+
+.input:hover {
+  --tw-input-ring-color: theme(colors.blue.300);
+}
+.input:focus, .input:focus-within {
+  --tw-input-ring-color: theme(colors.blue.500);
+  outline: none;
+}
+.input:is(.has-input-error *) {
+  --tw-input-ring-color: theme(colors.red.200);
+}
+.input:is(.has-input-error *):hover {
+  --tw-input-ring-color: theme(colors.red.300);
+}
+.input:is(.has-input-error *):focus {
+  --tw-input-ring-color: theme(colors.red.500);
+}
+.input.px-0 {
+  --tw-input-padding-x: 0;
+}
+
+.input[readonly] {
+  --tw-input-background-color: theme(colors.gray.100);
+}
+select.input {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 0.5rem 0.5rem;
+  padding-right: calc(var(--tw-input-padding-x) + 1rem);
+}
