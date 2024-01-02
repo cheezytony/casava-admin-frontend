@@ -16,7 +16,6 @@
     "@nuxt/devtools": "latest",
     "@nuxtjs/tailwindcss": "^6.10.1",
     "@types/uuid": "^9.0.7",
-    "crypto": "^1.0.1",
     "nuxt": "^3.8.2",
     "uuid": "^9.0.1"
   },
