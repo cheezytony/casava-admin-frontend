@@ -224,12 +224,12 @@ const sections = computed<
         type: 'currency:compact',
         description: '',
       },
-      {
-        title: 'TOTAL PREMIUM PAYMENTS',
-        value: totalPremiumPayments.value,
-        type: 'number',
-        description: '',
-      },
+      // {
+      //   title: 'TOTAL PREMIUM PAYMENTS',
+      //   value: totalPremiumPayments.value,
+      //   type: 'number',
+      //   description: '',
+      // },
       {
         title: 'NUMBER AND VALUE OF TRANSACTIONS',
         value: financialStats.data.value?.data?.total_transactions ?? '0',
