@@ -339,8 +339,6 @@ const setRange = (value: Range) => {
     endDate.value = end?.toISOString().split('T')[0] ?? null;
     nextTick(reload);
   }
-
-  console.log(startDate.value, endDate.value);
 };
 
 const reload = () => {
