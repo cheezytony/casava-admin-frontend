@@ -131,61 +131,68 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Popper :placement="placement" z-index="1099">
-    <template #default>
-      <div
-        class="inline"
-        data-ui-type="dropdown"
-        tabindex="0"
-        ref="triggerRef"
-        @click="handleTriggerClick"
-        @keydown="handleInputKeydown"
-      >
-        <slot :is-open="isOpen" />
-      </div>
-    </template>
-    <template #popper>
-      <div
-        ref="menuRef"
-        class="bg-white duration-300 pointer-events-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
-        :class="{
-          'opacity-0 pointer-events-none invisible': !isOpen,
-        }"
-        data-ui-type="dropdown-menu"
-      >
-        <slot v-if="$slots.items" name="items" :index="index" :close="close" />
-        <ul v-else-if="items.length" class="flex flex-col">
-          <template v-for="(item, itemIndex) in items" :key="itemIndex">
-            <!-- <hr v-if="item.isDivider" class="my-1" /> -->
-            <li @click="handleItemClick(item)">
-              <slot
-                v-if="$slots.item"
-                v-bind="{
-                  item,
-                  itemIndex,
-                  index,
-                  isSelected: itemIndex === index,
-                  close,
-                }"
-                name="item"
-              />
-              <component
-                v-else
-                :is="item.href ? NuxtLink : 'button'"
-                :href="item.href"
-                class="flex items-center justify-between px-4 py-2 rounded text-sm w-full whitespace-nowrap hover:bg-gray-100"
-                :class="{
-                  'bg-gray-100': itemIndex === index,
-                }"
-              >
-                <div class="flex items-center gap-2">
-                  <span class>{{ item.title }}</span>
-                </div>
-              </component>
-            </li>
-          </template>
-        </ul>
-      </div>
-    </template>
-  </Popper>
+  <ClientOnly>
+    <Popper :placement="placement" z-index="1099">
+      <template #default>
+        <div
+          class="inline"
+          data-ui-type="dropdown"
+          tabindex="0"
+          ref="triggerRef"
+          @click="handleTriggerClick"
+          @keydown="handleInputKeydown"
+        >
+          <slot :is-open="isOpen" />
+        </div>
+      </template>
+      <template #popper>
+        <div
+          ref="menuRef"
+          class="bg-white duration-300 pointer-events-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+          :class="{
+            'opacity-0 pointer-events-none invisible': !isOpen,
+          }"
+          data-ui-type="dropdown-menu"
+        >
+          <slot
+            v-if="$slots.items"
+            name="items"
+            :index="index"
+            :close="close"
+          />
+          <ul v-else-if="items.length" class="flex flex-col">
+            <template v-for="(item, itemIndex) in items" :key="itemIndex">
+              <!-- <hr v-if="item.isDivider" class="my-1" /> -->
+              <li @click="handleItemClick(item)">
+                <slot
+                  v-if="$slots.item"
+                  v-bind="{
+                    item,
+                    itemIndex,
+                    index,
+                    isSelected: itemIndex === index,
+                    close,
+                  }"
+                  name="item"
+                />
+                <component
+                  v-else
+                  :is="item.href ? NuxtLink : 'button'"
+                  :href="item.href"
+                  class="flex items-center justify-between px-4 py-2 rounded text-sm w-full whitespace-nowrap hover:bg-gray-100"
+                  :class="{
+                    'bg-gray-100': itemIndex === index,
+                  }"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class>{{ item.title }}</span>
+                  </div>
+                </component>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </template>
+    </Popper>
+  </ClientOnly>
 </template>

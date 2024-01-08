@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/named
 import type { ComputedRef, Ref } from 'vue';
 import {
   getFormData,
@@ -7,8 +6,6 @@ import {
   validateForm,
 } from 'vue3-form';
 import type { Form } from 'vue3-form';
-// import toastr from 'toastr';
-// eslint-disable-next-line import/named
 import axios, { isCancel } from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 import type { HTTPError, HTTPErrorData, HTTPResponseData } from '~~/types/http';
@@ -16,6 +13,8 @@ import type { HTTPError, HTTPErrorData, HTTPResponseData } from '~~/types/http';
 export type ServiceNames = 'casava' | 'smedan';
 
 export type APIRequestConfig = {
+  url: Ref<string> | ComputedRef<string> | string;
+  baseURL?: string;
   method?: string;
   headers?: object;
 
@@ -41,7 +40,7 @@ export const useApiRequest = <T>(
     service = 'casava',
     ...requestConfig
   }: APIRequestConfig,
-  { onSuccess, onError, onFinish }: APIResponseHandlers<T> = {}
+  { onSuccess, onError, onFinish }: APIResponseHandlers<T>
 ) => {
   const { signOut, sessionToken } = useAuth();
   const {
@@ -77,10 +76,8 @@ export const useApiRequest = <T>(
         headers.Authorization = `Bearer ${sessionToken.value}`;
       }
 
-      console.log(config.value.url);
-      
       axios<HTTPResponseData<T>>({
-        ...config.value,
+        ...config,
         headers,
         baseURL: baseURL.value,
       })
@@ -118,51 +115,4 @@ export const useApiRequest = <T>(
   if (autoLoad) load();
 
   return { isLoading, data, error, update, load };
-};
-
-export const useFormRequest = <T>(
-  form: Ref<Form>,
-  {
-    useFormData = false,
-    wrapperKey,
-    ...config
-  }: APIRequestConfig & { useFormData?: boolean, wrapperKey?: string },
-  { onSuccess, onError, onFinish }: APIResponseHandlers<T>
-) => {
-  const { load, update, ...data } = useApiRequest<T>(
-    config,
-    {
-      onSuccess: (data) => {
-        form.value.success = data?.message ?? null;
-        // toastr.success(data?.message ?? 'Operation Successful');
-        onSuccess?.(data);
-      },
-      onError: (error) => {
-        form.value.error = error.message;
-        error.errors && setFormErrors(form, error.errors);
-        console.log(error.errors);
-
-        onError?.(error);
-      },
-      onFinish: () => {
-        form.value.loading = false;
-        onFinish?.();
-      },
-    }
-  );
-  const submit = async () => {
-    if (!validateForm(form)) return;
-
-    form.value.loading = true;
-    form.value.error = null;
-    form.value.success = null;
-
-    const data = useFormData ? getFormData(form) : getRawFormData(form);
-    
-    update({ data });
-    
-    await load();
-  };
-
-  return { ...data, submit };
 };

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* accent-color: theme(colors.pink.500); */
+  @apply accent-pink-500;
+}
+::selection {
+  @apply bg-pink-500 text-white;
+}
+
 .input {
   --tw-input-background-color: white;
   --tw-input-border-radius: 4px;
@@ -44,6 +52,15 @@
   --tw-input-padding-y: 0.5rem;
   --tw-input-width: 100%;
 }
+[disabled=true] .input, .disabled .input {
+  --tw-input-border-opacity: 1;
+  --tw-input-opacity: 0.5;
+  background-color: var(--tw-input-background-color);
+  border-color: rgba(229, 231, 235, var(--tw-input-border-opacity));
+  opacity: var(--tw-input-opacity);
+  /* pointer-events: none; */
+  cursor: not-allowed;
+}
 
 .input-textarea {
   --tw-input-height: 12.5rem;
@@ -54,10 +71,10 @@
 }
 
 .input:hover {
-  --tw-input-ring-color: theme(colors.blue.300);
+  --tw-input-ring-color: theme(colors.pink.300);
 }
 .input:focus, .input:focus-within {
-  --tw-input-ring-color: theme(colors.blue.500);
+  --tw-input-ring-color: theme(colors.pink.500);
   outline: none;
 }
 .input:is(.has-input-error *) {

@@ -12,7 +12,7 @@
 const emit = defineEmits(['update:modelValue']);
 const props = withDefaults(defineProps<{
   type?: string;
-  modelValue?: string | number | boolean | Date;
+  modelValue?: string | number | Date;
   modelModifiers?: {
     capitalize: boolean;
     number: boolean;
