@@ -339,6 +339,8 @@ const setRange = (value: Range) => {
     endDate.value = end?.toISOString().split('T')[0] ?? null;
     nextTick(reload);
   }
+
+  console.log(startDate.value, endDate.value);
 };
 
 const reload = () => {
@@ -349,13 +351,11 @@ const reload = () => {
 };
 
 watch([startDate, endDate], () => {
-  if (startDate.value && endDate.value) {
-    const params = { start_date: startDate.value, end_date: endDate.value };
-    smedanStats.update({ params });
-    d2cStats.update({ params });
-    b2bStats.update({ params });
-    financialStats.update({ params });
-  }
+  const params = { start_date: startDate.value, end_date: endDate.value };
+  smedanStats.update({ params });
+  d2cStats.update({ params });
+  b2bStats.update({ params });
+  financialStats.update({ params });
 });
 </script>
 
@@ -376,14 +376,17 @@ watch([startDate, endDate], () => {
             {{ selectedRange?.title ?? 'Today' }}
           </Button>
         </template>
-        <template #items>
+        <template #items="{ close }">
           <div id="something" class="min-w-[16rem]">
             <DropdownItem
               v-for="item in rangeOptions"
               :key="item.value"
               :value="item.value"
               :is-selected="item.value === range"
-              @click="setRange(item.value)"
+              @click="() => {
+                setRange(item.value);
+                close();
+              }"
             >
               {{ item.title }}
             </DropdownItem>

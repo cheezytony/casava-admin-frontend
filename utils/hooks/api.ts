@@ -77,8 +77,6 @@ export const useApiRequest = <T>(
         headers.Authorization = `Bearer ${sessionToken.value}`;
       }
 
-      console.log(config.value.url);
-      
       axios<HTTPResponseData<T>>({
         ...config.value,
         headers,
