@@ -1,0 +1,70 @@
+#### GROWTH (BUSINESS GRO)
+- TOTAL SIGNUP
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - Should be able to filter by Channel which is USSD/SMEDAN
+  - Should be able to filter by business type (Based on the business type provided by the users when they registered)
+- TOTAL BUSINESS GRO SUBSCRIBERS
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - Should be able to filter by Channel which is USSD/SMEDAN
+  - Should be able to filter by business type (Based on the business type provided by the users when they registered)
+- DIFFERENCE (SIGNUP - TOTAL BUSINESS GRO SUBSCRIBERS)
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - Should be able to filter by Channel which is USSD/SMEDAN
+  - Should be able to filter by business type (Based on the business type provided by the users when they registered)
+- CHURN RATE
+#### D2C
+- TOTAL SIGNUPS
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - i should be able to filter based on product (Health cash, Health insurance, Hospicash, Income protection)
+- TOTAL VERIFIED USERS
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - i should be able to filter based on product (Health cash, Health insurance, Hospicash, Income protection)
+- TOTAL UNVERIFIED USERS
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - i should be able to filter based on product (Health cash, Health insurance, Hospicash, Income protection)
+- TOTAL POLICIES CREATED
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - i should be able to filter based on product (Health cash, Health insurance, Hospicash, Income protection)
+- TOTAL PREMIUM PAYMENTS
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - i should be able to filter based on product (Health cash, Health insurance, Hospicash, Income protection)
+- TOTAL ACTIVE POLICIES
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - i should be able to filter based on product (Health cash, Health insurance, Hospicash, Income protection)
+- TOTAL INACTIVE POLICIES
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - i should be able to filter based on product (Health cash, Health insurance, Hospicash, Income protection)
+#### B2B (BLOOM)
+- TOTAL SIGNUPS (PARTNERS)
+  - I Should be able to filter by Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - I Should be able to filter by Products (that is the insurance product the partner is buying)
+- TOTAL POLICIES CREATED
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - I Should be able to filter by products sold/purchased by the partner
+  - Filter by partner i.e which partner sold/purchased what policy
+  - Sort by highest to lowest
+- TOTAL CUSTOMERS (CUSTOMERS EACH PARTNER ONBOARDED)
+  - I Should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - I should be able to filter by products (i.e which product do these customers have)
+  - Sort by highest to lowest
+- TOTAL PREMIUM PAYMENTS
+  - I should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - I should be able to filter by product
+- TOTAL ACTIVE POLICIES
+  - I should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - I should be able to filter by product
+- TOTAL INACTIVE POLICIES
+  - I should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - I should be able to filter by product
+#### FINANCIALS
+- Total policies created
+  - I should be able to filter by Date which should be Year, Month, Week, Days.  this should also be represented in both chart format and data figure)
+  - I should be able to filter by product
+  - I should be able to filter by partner
+- Total premium payments (across all platforms and products) for count and volume
+  - I should be able to filer by platform/channel (D2C, SMEDAN, B2B)
+  - i should be able to filter by product
+  - I should be able to filter by Date which should be Year, Month, Week, Days.
+- Number and value of transactions
+- Payment success rate (%)
+- Average transaction value
