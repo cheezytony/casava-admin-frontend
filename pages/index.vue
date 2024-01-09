@@ -41,7 +41,7 @@ const d2cStats = useApiRequest<{
 }>({
   url: '/dashboard-stats/customers',
   method: 'GET',
-  // autoLoad: true,
+  autoLoad: true,
   params: {
     start_date: startDate.value,
     end_date: endDate.value,
@@ -57,7 +57,7 @@ const b2bStats = useApiRequest<{
 }>({
   url: '/dashboard-stats/business',
   method: 'GET',
-  // autoLoad: true,
+  autoLoad: true,
   params: {
     start_date: startDate.value,
     end_date: endDate.value,
@@ -70,7 +70,7 @@ const financialStats = useApiRequest<{
 }>({
   url: '/dashboard-stats/financials',
   method: 'GET',
-  // autoLoad: true,
+  autoLoad: true,
   params: {
     start_date: startDate.value,
     end_date: endDate.value,
@@ -276,6 +276,7 @@ type Range =
   | 'today'
   | 'yesterday'
   | 'this-week'
+  | 'last-week'
   | 'this-month'
   | 'this-year'
   | 'last-year'
@@ -289,6 +290,7 @@ const rangeOptions = computed<Array<RangeOption>>(() => [
   { title: 'Today', value: 'today' },
   { title: 'Yesterday', value: 'yesterday' },
   { title: 'This Week', value: 'this-week' },
+  { title: 'Last Week', value: 'last-week' },
   { title: 'This Month', value: 'this-month' },
   { title: 'This Year', value: 'this-year' },
   { title: 'Last Year', value: 'last-year' },
@@ -311,6 +313,10 @@ const setRange = (value: Range) => {
       break;
     case 'this-week':
       start.setDate(start.getDate() - 7);
+      break;
+    case 'last-week':
+      start.setDate(start.getDate() - 14);
+      end.setDate(end.getDate() - 7);
       break;
     case 'this-month':
       start.setMonth(start.getMonth() - 1);
