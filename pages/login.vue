@@ -3,7 +3,7 @@ definePageMeta({
   middleware: ['guest-only'],
   // redirect: '/api/auth/signin',
 });
-const { signIn, signOut, session, status } = useAuth();
+const { signIn } = useAuth();
 </script>
 
 <template>
@@ -12,7 +12,7 @@ const { signIn, signOut, session, status } = useAuth();
       color-scheme="pink"
       left-icon="arrow-right-to-bracket"
       is-rounded
-      @click="signIn"
+      @click="signIn('google')"
     >
       Click to sign in
     </Button>
