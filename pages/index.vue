@@ -13,8 +13,6 @@ useHead({
 });
 
 const today = new Date().toISOString().split('T')[0];
-const startDate = ref<string | null>(today);
-const endDate = ref<string | null>(today);
 
 const smedanStats = useApiRequest<{
   churn_rate: number;
@@ -27,8 +25,8 @@ const smedanStats = useApiRequest<{
   autoLoad: true,
   service: 'smedan',
   params: {
-    start_date: startDate.value,
-    end_date: endDate.value,
+    start_date: today,
+    end_date: today,
   },
 });
 const d2cStats = useApiRequest<{
@@ -43,8 +41,8 @@ const d2cStats = useApiRequest<{
   method: 'GET',
   autoLoad: true,
   params: {
-    start_date: startDate.value,
-    end_date: endDate.value,
+    start_date: today,
+    end_date: today,
   },
 });
 const b2bStats = useApiRequest<{
@@ -59,8 +57,8 @@ const b2bStats = useApiRequest<{
   method: 'GET',
   autoLoad: true,
   params: {
-    start_date: startDate.value,
-    end_date: endDate.value,
+    start_date: today,
+    end_date: today,
   },
 });
 const financialStats = useApiRequest<{
@@ -72,8 +70,8 @@ const financialStats = useApiRequest<{
   method: 'GET',
   autoLoad: true,
   params: {
-    start_date: startDate.value,
-    end_date: endDate.value,
+    start_date: today,
+    end_date: today,
   },
 });
 
@@ -107,7 +105,7 @@ const sections = computed<
     isLoading: smedanStats.isLoading.value,
     stats: [
       {
-        title: 'TOTAL SIGNUP',
+        title: 'TOTAL BUSINESS REGISTRATIONS',
         value: smedanStats.data.value?.data?.total_signup ?? '0',
         type: 'number',
         description: '',
@@ -119,7 +117,7 @@ const sections = computed<
         description: '',
       },
       {
-        title: 'DIFFERENCE',
+        title: 'TOTAL LEADS',
         value: smedanStats.data.value?.data?.difference,
         type: 'number',
         description: '',
@@ -272,81 +270,6 @@ const sections = computed<
   },
 ]);
 
-type Range =
-  | 'today'
-  | 'yesterday'
-  | 'this-week'
-  | 'last-week'
-  | 'this-month'
-  | 'this-year'
-  | 'last-year'
-  | 'all-time'
-  | 'custom';
-interface RangeOption {
-  title: string;
-  value: Range;
-}
-const rangeOptions = computed<Array<RangeOption>>(() => [
-  { title: 'Today', value: 'today' },
-  { title: 'Yesterday', value: 'yesterday' },
-  { title: 'This Week', value: 'this-week' },
-  { title: 'Last Week', value: 'last-week' },
-  { title: 'This Month', value: 'this-month' },
-  { title: 'This Year', value: 'this-year' },
-  { title: 'Last Year', value: 'last-year' },
-  { title: 'All Time', value: 'all-time' },
-  { title: 'Custom', value: 'custom' },
-]);
-const range = ref<Range>('today');
-const selectedRange = computed(() =>
-  rangeOptions.value.find((item) => item.value === range.value)
-);
-
-const setRange = (value: Range) => {
-  let start: Date | null = new Date();
-  let end: Date | null = new Date();
-  range.value = value;
-  switch (value) {
-    case 'yesterday':
-      start.setDate(start.getDate() - 1);
-      end.setDate(end.getDate() - 1);
-      break;
-    case 'this-week':
-      start.setDate(start.getDate() - 7);
-      break;
-    case 'last-week':
-      start.setDate(start.getDate() - 14);
-      end.setDate(end.getDate() - 7);
-      break;
-    case 'this-month':
-      start.setMonth(start.getMonth() - 1);
-      break;
-    case 'this-year':
-      start.setFullYear(start.getFullYear() - 1);
-      start.setMonth(0);
-      start.setDate(1);
-      break;
-    case 'last-year':
-      start.setFullYear(start.getFullYear() - 1);
-      start.setMonth(0);
-      start.setDate(1);
-      end.setFullYear(end.getFullYear() - 1);
-      end.setMonth(11);
-      end.setDate(31);
-      break;
-    case 'all-time':
-      start = null;
-      end = null;
-      break;
-  }
-
-  if (value !== 'custom') {
-    startDate.value = start?.toISOString().split('T')[0] ?? null;
-    endDate.value = end?.toISOString().split('T')[0] ?? null;
-    nextTick(reload);
-  }
-};
-
 const reload = () => {
   smedanStats.load();
   d2cStats.load();
@@ -354,13 +277,15 @@ const reload = () => {
   financialStats.load();
 };
 
-watch([startDate, endDate], () => {
-  const params = { start_date: startDate.value, end_date: endDate.value };
+const onDateChange = ([startDate, endDate]: [string | null, string | null]) => {
+  const params = { start_date: startDate, end_date: endDate };
   smedanStats.update({ params });
   d2cStats.update({ params });
   b2bStats.update({ params });
   financialStats.update({ params });
-});
+
+  reload();
+};
 </script>
 
 <template>
@@ -368,49 +293,7 @@ watch([startDate, endDate], () => {
     <PageHeading>Dashboard</PageHeading>
 
     <div class="flex flex-wrap gap-4 items-end mb-8">
-      <Dropdown>
-        <template #default="{ isOpen }">
-          <Button
-            color-scheme="pink"
-            size="sm"
-            is-rounded
-            left-icon="calendar-days"
-            :right-icon="isOpen ? 'angle-up' : 'angle-down'"
-          >
-            {{ selectedRange?.title ?? 'Today' }}
-          </Button>
-        </template>
-        <template #items="{ close }">
-          <div id="something" class="min-w-[16rem]">
-            <DropdownItem
-              v-for="item in rangeOptions"
-              :key="item.value"
-              :value="item.value"
-              :is-selected="item.value === range"
-              @click="() => {
-                setRange(item.value);
-                close();
-              }"
-            >
-              {{ item.title }}
-            </DropdownItem>
-          </div>
-        </template>
-      </Dropdown>
-      <FormGroup
-        type="date"
-        class="input-sm"
-        :disabled="range !== 'custom'"
-        label="From"
-        v-model="startDate"
-      />
-      <FormGroup
-        type="date"
-        class="input-sm"
-        :disabled="range !== 'custom'"
-        label="To"
-        v-model="endDate"
-      />
+      <DateRange @update:model-value="onDateChange" />
       <Button
         color-scheme="pink"
         size="sm"

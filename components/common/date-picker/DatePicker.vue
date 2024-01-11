@@ -8,13 +8,20 @@ const props = withDefaults(
     modelValue?: Date;
   }>(),
   {
-    monthCount: 3,
+    monthCount: 1,
   }
 );
 
 const isOpen = ref(false);
 const today = new Date();
 const inputValue = ref(props.modelValue ?? today);
+const inputValueFormatted = computed(() => {
+  return inputValue.value?.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+});
 const navigationDate = ref(inputValue.value ?? today);
 const year = computed(() => navigationDate.value?.getFullYear());
 const month = computed(() => navigationDate.value?.getMonth());
@@ -61,8 +68,8 @@ const goToPreviousMonth = () => {
       <div class="flex gap-2">
         <input
           type="text"
-          class="w-24 text-center border border-pink-200 rounded-md"
-          :value="inputValue"
+          class="input input-sm"
+          :value="inputValueFormatted"
           readonly
         />
       </div>

@@ -35,6 +35,7 @@ const isOpen = ref(false);
 const open = () => {
   isOpen.value = true;
   emit('open');
+  nextTick(updateItemsRendered);
 };
 const close = () => {
   isOpen.value = false;
@@ -48,6 +49,7 @@ const index = ref<number | null>(null);
 const itemsRendered = ref(0);
 const updateItemsRendered = () => {
   itemsRendered.value = menuRef.value!.querySelectorAll('ul > li').length || 0;
+  console.log(menuRef.value!.querySelectorAll('ul > li').length);
 };
 const maxItems = computed(() => {
   if (slots.items) return itemsRendered.value;
