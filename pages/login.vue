@@ -3,6 +3,9 @@ definePageMeta({
   middleware: ['guest-only'],
   // redirect: '/api/auth/signin',
 });
+useHead({
+  title: 'Login',
+});
 const { signIn } = useAuth();
 </script>
 
