@@ -43,7 +43,8 @@ const sections = computed<
     Number(smedanStats.data.value?.data?.difference ?? 0);
   const totalPoliciesToday =
     Number(d2cStats.data.value?.data?.total_policies_created ?? 0) +
-    Number(b2bStats.data.value?.data?.total_policies_created ?? 0);
+    Number(b2bStats.data.value?.data?.total_policies_created ?? 0) +
+    Number(smedanStats.data.value?.data?.total_business_gro_subscribers ?? 0);
   const totalSignupsToday =
     Number(d2cStats.data.value?.data?.total_signups ?? 0) +
     Number(smedanStats.data.value?.data?.total_signup ?? 0);

@@ -14,6 +14,10 @@ const links: Array<{ title: string; href: string }> = [
   //   href: '/b2b',
   // },
   {
+    title: 'Overview',
+    href: '/',
+  },
+  {
     title: 'Dashboard',
     href: '/dashboard',
   },
@@ -41,7 +45,7 @@ const isActive = (link: { href: string; exact?: boolean }) => {
     class="fixed bg-white border-b border-pink-200 shadow-md shadow-gray-200 left-0 top-0 w-full z-[1000]"
   >
     <Container class="flex gap-6 h-20 items-center md:gap-16" flush-y>
-      <NuxtLink class="font-light inline-flex flex-col text-2xl" href="/">
+      <NuxtLink class="font-light inline-flex flex-col text-2xl" href="/dashboard">
         <LogoDefault />
         <span class="text-xs font-bold font-mono text-pink-500">Admin</span>
       </NuxtLink>

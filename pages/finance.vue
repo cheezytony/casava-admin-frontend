@@ -22,14 +22,18 @@ const allowedUsers = [
   'adelekan@casava.co',
   'antonio@casava.co',
 ];
-const isAllowed = computed(() => allowedUsers.includes(session.value?.user?.email as string));
+const isAllowed = computed(() =>
+  allowedUsers.includes(session.value?.user?.email as string)
+);
 
+const smedanStats = useSmedanStats();
 const d2cStats = useD2cStats();
 const b2bStats = useB2bStats();
 const financeStats = useFinanceStats();
 
 const isLoading = computed(
   () =>
+    smedanStats.isLoading.value ||
     d2cStats.isLoading.value ||
     b2bStats.isLoading.value ||
     financeStats.isLoading.value
@@ -51,51 +55,57 @@ const sections = computed<
     isLoading: boolean;
     stats: Array<DataListItem>;
   }>
->(() => [
-  {
-    title: 'FINANCIALS',
-    href: '',
-    isLoading: financeStats.isLoading.value,
-    stats: [
-      {
-        title: 'TOTAL POLICIES CREATED',
-        value: financeStats.data.value?.data?.total_policies ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL PREMIUM PAYMENT AMOUNT',
-        value: totalPremiumPayments.value,
-        type: 'currency:compact',
-        description: '',
-      },
-      // {
-      //   title: 'TOTAL PREMIUM PAYMENTS',
-      //   value: totalPremiumPayments.value,
-      //   type: 'number',
-      //   description: '',
-      // },
-      {
-        title: 'NUMBER AND VALUE OF TRANSACTIONS',
-        value: financeStats.data.value?.data?.total_transactions ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'PAYMENT SUCCESS RATE (%)',
-        value: undefined,
-        type: 'percentage',
-        description: '',
-      },
-      {
-        title: 'AVERAGE TRANSACTION VALUE',
-        value: undefined,
-        type: 'number',
-        description: '',
-      },
-    ],
-  },
-]);
+>(() => {
+  const totalPolicies =
+    Number(d2cStats.data.value?.data?.total_policies_created ?? 0) +
+    Number(b2bStats.data.value?.data?.total_policies_created ?? 0) +
+    Number(smedanStats.data.value?.data?.total_business_gro_subscribers ?? 0);
+  return [
+    {
+      title: 'FINANCIALS',
+      href: '',
+      isLoading: isLoading.value,
+      stats: [
+        {
+          title: 'TOTAL POLICIES CREATED',
+          value: totalPolicies,
+          type: 'number',
+          description: '',
+        },
+        {
+          title: 'TOTAL PREMIUM PAYMENT AMOUNT',
+          value: totalPremiumPayments.value,
+          type: 'currency:compact',
+          description: '',
+        },
+        // {
+        //   title: 'TOTAL PREMIUM PAYMENTS',
+        //   value: totalPremiumPayments.value,
+        //   type: 'number',
+        //   description: '',
+        // },
+        {
+          title: 'NUMBER AND VALUE OF TRANSACTIONS',
+          value: financeStats.data.value?.data?.total_transactions ?? '0',
+          type: 'number',
+          description: '',
+        },
+        {
+          title: 'PAYMENT SUCCESS RATE (%)',
+          value: undefined,
+          type: 'percentage',
+          description: '',
+        },
+        {
+          title: 'AVERAGE TRANSACTION VALUE',
+          value: undefined,
+          type: 'number',
+          description: '',
+        },
+      ],
+    },
+  ];
+});
 
 const reload = () => {
   financeStats.load();
@@ -116,7 +126,7 @@ const onDateChange = ([startDate, endDate]: [string | null, string | null]) => {
 <template>
   <Container v-if="isAllowed">
     <PageHeading>Finance</PageHeading>
-    
+
     <div class="flex flex-wrap gap-4 items-end mb-8">
       <DateRange @update:model-value="onDateChange" />
       <Button
@@ -155,7 +165,9 @@ const onDateChange = ([startDate, endDate]: [string | null, string | null]) => {
     </div>
   </Container>
   <div v-else class="grid h-[100dvh] -mt-20 place-items-center">
-    <div class="bg-white border border-pink-200 px-6 py-8 rounded-xl max-w-full text-center w-[40rem] md:px-8">
+    <div
+      class="bg-white border border-pink-200 px-6 py-8 rounded-xl max-w-full text-center w-[40rem] md:px-8"
+    >
       <h1 class="text-lg">You are not authorized to access this page</h1>
     </div>
   </div>
