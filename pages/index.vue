@@ -55,12 +55,13 @@ const sections = computed<
     Number(yesterdaySmedanStats.data.value?.data?.difference ?? 0);
   const totalPoliciesYesterday =
     Number(yesterdayD2cStats.data.value?.data?.total_policies_created ?? 0) +
-    Number(yesterdayB2bStats.data.value?.data?.total_policies_created ?? 0);
+    Number(yesterdayB2bStats.data.value?.data?.total_policies_created ?? 0) +
+    Number(yesterdaySmedanStats.data.value?.data?.total_business_gro_subscribers ?? 0);
   const totalSignupsYesterday =
     Number(yesterdayD2cStats.data.value?.data?.total_signups ?? 0) +
     Number(yesterdaySmedanStats.data.value?.data?.total_signup ?? 0);
 
-  console.log({ totalSignupsToday, totalSignupsYesterday });
+  console.log({ totalPoliciesToday, totalPoliciesYesterday });
 
   const signupsGrowth = ((totalSignupsToday - totalSignupsYesterday) / totalSignupsYesterday);
   const leadsGrowth = ((totalLeadsToday - totalLeadsYesterday) / totalLeadsYesterday);

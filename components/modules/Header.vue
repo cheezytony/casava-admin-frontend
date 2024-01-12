@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 const { signIn, signOut, session, status } = useAuth();
-const links: Array<{ title: string; href: string }> = [
+const links: Array<{ title: string; href: string; exact?: boolean }> = [
   // {
   //   title: 'Business GRO',
   //   href: '/business-gro',
@@ -16,6 +16,7 @@ const links: Array<{ title: string; href: string }> = [
   {
     title: 'Overview',
     href: '/',
+    exact: true,
   },
   {
     title: 'Dashboard',
