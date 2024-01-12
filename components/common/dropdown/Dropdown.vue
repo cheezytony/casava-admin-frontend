@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { NuxtLink } from '#components';
 import type { Placement } from '@popperjs/core';
+import { v4 } from 'uuid';
+import type { DropdownProvision } from '~/types';
 
 export interface DropdownItem {
   disabled?: boolean;
@@ -27,7 +29,6 @@ const props = withDefaults(
   }
 );
 
-const slots = useSlots();
 const menuRef = ref<HTMLElement>();
 const triggerRef = ref<HTMLElement>();
 
@@ -48,13 +49,9 @@ const toggle = () => {
 const index = ref<number | null>(null);
 const itemsRendered = ref(0);
 const updateItemsRendered = () => {
-  itemsRendered.value = menuRef.value!.querySelectorAll('ul > li').length || 0;
-  console.log(menuRef.value!.querySelectorAll('ul > li').length);
+  itemsRendered.value = menuRef.value!.querySelectorAll('[data-ui-type=dropdown-item]').length || 0;
 };
-const maxItems = computed(() => {
-  if (slots.items) return itemsRendered.value;
-  return props.items.filter((item) => !item.isDivider).length;
-});
+const maxItems = computed(() => itemsRendered.value);
 const next = () => {
   updateItemsRendered();
   if (index.value === null) {
@@ -73,13 +70,8 @@ const prev = () => {
 };
 const select = () => {
   if (index.value === null) return;
-  const item = menuRef.value!.querySelectorAll('ul > li')[index.value];
-  if (!item) return;
-  const link = item.querySelector<HTMLAnchorElement | HTMLButtonElement>(
-    'a, button'
-  );
-  if (!link) return;
-  link.click();
+  const items = menuRef.value!.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>('[data-ui-type=dropdown-item]');
+  items[index.value]?.click();
 };
 
 const handleTriggerClick = () => toggle();
@@ -130,6 +122,8 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('click', handleOutsideClick);
 });
+
+provide<DropdownProvision>('dropdown', { isOpen, index, next, prev });
 </script>
 
 <template>
@@ -177,19 +171,11 @@ onUnmounted(() => {
                   }"
                   name="item"
                 />
-                <component
-                  v-else
-                  :is="item.href ? NuxtLink : 'button'"
-                  :href="item.href"
-                  class="flex items-center justify-between px-4 py-2 rounded text-sm w-full whitespace-nowrap hover:bg-gray-100"
-                  :class="{
-                    'bg-gray-100': itemIndex === index,
-                  }"
-                >
+                <DropdownItem :href="item.href" v-else>
                   <div class="flex items-center gap-2">
                     <span class>{{ item.title }}</span>
                   </div>
-                </component>
+                </DropdownItem>
               </li>
             </template>
           </ul>

@@ -9,87 +9,25 @@ definePageMeta({
 });
 
 useHead({
-  title: 'Dashboard',
+  title: 'Business Today',
 });
 
-const today = new Date().toISOString().split('T')[0];
+const yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
 
-const smedanStats = useApiRequest<{
-  churn_rate: number;
-  difference: number;
-  total_business_gro_subscribers: number;
-  total_signup: number;
-}>({
-  url: '/dashboard-stats',
-  method: 'GET',
-  autoLoad: true,
-  service: 'smedan',
-  params: {
-    start_date: today,
-    end_date: today,
-  },
-});
-const d2cStats = useApiRequest<{
-  total_signups: number;
-  total_verified_users: number;
-  total_policies_created: number;
-  total_premium_payments: number;
-  total_active_policies: number;
-  total_inactive_policies: number;
-}>({
-  url: '/dashboard-stats/customers',
-  method: 'GET',
-  autoLoad: true,
-  params: {
-    start_date: today,
-    end_date: today,
-  },
-});
-const b2bStats = useApiRequest<{
-  total_partners: number;
-  total_policies_created: number;
-  total_partner_premium_payments: number;
-  total_active_partner_policies: number;
-  total_inactive_partner_policies: number;
-  total_partner_customers: number;
-}>({
-  url: '/dashboard-stats/business',
-  method: 'GET',
-  autoLoad: true,
-  params: {
-    start_date: today,
-    end_date: today,
-  },
-});
-const financialStats = useApiRequest<{
-  total_policies: number;
-  total_premium_payments: number;
-  total_transactions: number;
-}>({
-  url: '/dashboard-stats/financials',
-  method: 'GET',
-  autoLoad: true,
-  params: {
-    start_date: today,
-    end_date: today,
-  },
-});
+const smedanStats = useSmedanStats();
+const d2cStats = useD2cStats();
+const b2bStats = useB2bStats();
+const yesterdayD2cStats = useD2cStats(yesterday);
+const yesterdaySmedanStats = useSmedanStats(yesterday);
+const yesterdayB2bStats = useB2bStats(yesterday);
 
 const isLoading = computed(
   () =>
+    smedanStats.isLoading.value ||
     d2cStats.isLoading.value ||
-    b2bStats.isLoading.value ||
-    financialStats.isLoading.value
+    b2bStats.isLoading.value
 );
-
-const totalPremiumPayments = computed(() => {
-  if (b2bStats.isLoading.value && d2cStats.isLoading.value) return 0;
-  if (!b2bStats.data.value || !d2cStats.data.value) return 0;
-  return (
-    Number(b2bStats.data.value.data?.total_partner_premium_payments) +
-    Number(d2cStats.data.value.data?.total_premium_payments)
-  );
-});
 
 const sections = computed<
   Array<{
@@ -98,214 +36,91 @@ const sections = computed<
     isLoading: boolean;
     stats: Array<DataListItem>;
   }>
->(() => [
-  {
-    title: 'SMEDAN (BUSINESS GRO)',
-    href: '/business-gro',
-    isLoading: smedanStats.isLoading.value,
-    stats: [
-      {
-        title: 'TOTAL BUSINESS REGISTRATIONS',
-        value: smedanStats.data.value?.data?.total_signup ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL BUSINESS GRO SUBSCRIBERS',
-        value: smedanStats.data.value?.data?.total_business_gro_subscribers,
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL LEADS',
-        value: smedanStats.data.value?.data?.difference,
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'CHURN RATE',
-        value: smedanStats.data.value?.data?.churn_rate,
-        type: 'number',
-        description: '',
-      },
-    ],
-  },
-  {
-    title: 'D2C',
-    href: '',
-    isLoading: d2cStats.isLoading.value,
-    stats: [
-      {
-        title: 'TOTAL SIGNUPS',
-        value: d2cStats.data.value?.data?.total_signups ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL VERIFIED USERS',
-        value: d2cStats.data.value?.data?.total_verified_users ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL UNVERIFIED USERS',
-        value:
-          (d2cStats.data.value?.data?.total_signups ?? 0) -
-          (d2cStats.data.value?.data?.total_verified_users ?? 0),
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL POLICIES CREATED',
-        value: d2cStats.data.value?.data?.total_policies_created ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL PREMIUM PAYMENTS',
-        value: d2cStats.data.value?.data?.total_premium_payments ?? '0',
-        type: 'currency:compact',
-        description: '',
-      },
-      {
-        title: 'TOTAL ACTIVE POLICIES',
-        value: d2cStats.data.value?.data?.total_active_policies ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL INACTIVE POLICIES',
-        value: d2cStats.data.value?.data?.total_inactive_policies ?? '0',
-        type: 'number',
-        description: '',
-      },
-    ],
-  },
-  {
-    title: 'B2B (BLOOM)',
-    href: '',
-    isLoading: b2bStats.isLoading.value,
-    stats: [
-      {
-        title: 'TOTAL SIGNUPS (PARTNERS)',
-        value: b2bStats.data.value?.data?.total_partners ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL POLICIES CREATED',
-        value: b2bStats.data.value?.data?.total_policies_created ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL CUSTOMERS (CUSTOMERS EACH PARTNER ONBOARDED)',
-        value: b2bStats.data.value?.data?.total_partner_customers,
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL PREMIUM PAYMENTS',
-        value: b2bStats.data.value?.data?.total_partner_premium_payments ?? '0',
-        type: 'currency:compact',
-        description: '',
-      },
-      {
-        title: 'TOTAL ACTIVE POLICIES',
-        value: b2bStats.data.value?.data?.total_active_partner_policies ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL INACTIVE POLICIES',
-        value:
-          b2bStats.data.value?.data?.total_inactive_partner_policies ?? '0',
-        type: 'number',
-        description: '',
-      },
-    ],
-  },
-  {
-    title: 'FINANCIALS',
-    href: '',
-    isLoading: financialStats.isLoading.value,
-    stats: [
-      {
-        title: 'TOTAL POLICIES CREATED',
-        value: financialStats.data.value?.data?.total_policies ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'TOTAL PREMIUM PAYMENT AMOUNT',
-        value: totalPremiumPayments.value,
-        type: 'currency:compact',
-        description: '',
-      },
-      // {
-      //   title: 'TOTAL PREMIUM PAYMENTS',
-      //   value: totalPremiumPayments.value,
-      //   type: 'number',
-      //   description: '',
-      // },
-      {
-        title: 'NUMBER AND VALUE OF TRANSACTIONS',
-        value: financialStats.data.value?.data?.total_transactions ?? '0',
-        type: 'number',
-        description: '',
-      },
-      {
-        title: 'PAYMENT SUCCESS RATE (%)',
-        value: undefined,
-        type: 'percentage',
-        description: '',
-      },
-      {
-        title: 'AVERAGE TRANSACTION VALUE',
-        value: undefined,
-        type: 'number',
-        description: '',
-      },
-    ],
-  },
-]);
+>(() => {
+  const totalLeadsToday =
+    Number(d2cStats.data.value?.data?.total_signups ?? 0) -
+    Number(d2cStats.data.value?.data?.total_active_policies ?? 0) +
+    Number(smedanStats.data.value?.data?.difference ?? 0);
+  const totalPoliciesToday =
+    Number(d2cStats.data.value?.data?.total_policies_created ?? 0) +
+    Number(b2bStats.data.value?.data?.total_policies_created ?? 0);
+  const totalSignupsToday =
+    Number(d2cStats.data.value?.data?.total_signups ?? 0) +
+    Number(smedanStats.data.value?.data?.total_signup ?? 0);
 
-const reload = () => {
-  smedanStats.load();
-  d2cStats.load();
-  b2bStats.load();
-  financialStats.load();
-};
+  const totalLeadsYesterday =
+    Number(yesterdayD2cStats.data.value?.data?.total_signups ?? 0) -
+    Number(yesterdayD2cStats.data.value?.data?.total_active_policies ?? 0) +
+    Number(yesterdaySmedanStats.data.value?.data?.difference ?? 0);
+  const totalPoliciesYesterday =
+    Number(yesterdayD2cStats.data.value?.data?.total_policies_created ?? 0) +
+    Number(yesterdayB2bStats.data.value?.data?.total_policies_created ?? 0);
+  const totalSignupsYesterday =
+    Number(yesterdayD2cStats.data.value?.data?.total_signups ?? 0) +
+    Number(yesterdaySmedanStats.data.value?.data?.total_signup ?? 0);
 
-const onDateChange = ([startDate, endDate]: [string | null, string | null]) => {
-  const params = { start_date: startDate, end_date: endDate };
-  smedanStats.update({ params });
-  d2cStats.update({ params });
-  b2bStats.update({ params });
-  financialStats.update({ params });
+  console.log({ totalSignupsToday, totalSignupsYesterday });
 
-  reload();
-};
+  const signupsGrowth = ((totalSignupsToday - totalSignupsYesterday) / totalSignupsYesterday);
+  const leadsGrowth = ((totalLeadsToday - totalLeadsYesterday) / totalLeadsYesterday);
+  const policiesGrowth = ((totalPoliciesToday - totalPoliciesYesterday) / totalPoliciesYesterday);
+
+  return [
+    {
+      title: 'BUSINESS TODAY',
+      href: '',
+      isLoading: isLoading.value,
+      stats: [
+        {
+          title: 'Total policies Generated',
+          value: totalPoliciesToday,
+          type: 'number',
+          description: '',
+        },
+        {
+          title: 'Total Leads',
+          value: totalLeadsToday,
+          type: 'number',
+          description: '',
+        },
+        {
+          title: 'Total claims',
+          value: undefined,
+          type: 'number',
+          description: '',
+        },
+      ],
+    },
+    {
+      title: 'Growth',
+      isLoading: isLoading.value,
+      stats: [
+        {
+          title: 'Signups',
+          value: signupsGrowth,
+          type: 'percentage:compact',
+          description: '',
+        },
+        {
+          title: 'Leads',
+          value: leadsGrowth,
+          type: 'percentage:compact',
+          description: '',
+        },
+        {
+          title: 'Policies Created',
+          value: policiesGrowth,
+          type: 'percentage:compact',
+          description: '',
+        },
+      ],
+    },
+  ];
+});
 </script>
 
 <template>
   <Container>
-    <PageHeading>Dashboard</PageHeading>
-
-    <div class="flex flex-wrap gap-4 items-end mb-8">
-      <DateRange @update:model-value="onDateChange" />
-      <Button
-        color-scheme="pink"
-        size="sm"
-        :is-loading="isLoading"
-        is-rounded
-        left-icon="rotate-right"
-        @click="reload"
-      >
-        Reload
-      </Button>
-    </div>
-
     <div class="gap-16 flex flex-col">
       <template v-for="(section, sectionIndex) in sections" :key="sectionIndex">
         <PageSection :title="section.title" flush>
@@ -323,15 +138,6 @@ const onDateChange = ([startDate, endDate]: [string | null, string | null]) => {
             </div>
           </template>
           <template #cta>
-            <!-- <Button
-              color-scheme="pink"
-              :href="section.href"
-              size="sm"
-              is-rounded
-            >
-              <span>View more</span>
-              <IconChevronRight class="w-3 h-3" />
-            </Button> -->
             <LoaderSmall v-if="section.isLoading" />
           </template>
         </PageSection>

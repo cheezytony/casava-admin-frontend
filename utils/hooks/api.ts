@@ -1,16 +1,12 @@
-// eslint-disable-next-line import/named
-import type { ComputedRef, Ref } from 'vue';
+import type { Ref } from 'vue';
 import {
   getFormData,
   getRawFormData,
   setFormErrors,
   validateForm,
+  type Form,
 } from 'vue3-form';
-import type { Form } from 'vue3-form';
-// import toastr from 'toastr';
-// eslint-disable-next-line import/named
-import axios, { isCancel } from 'axios';
-import type { AxiosRequestConfig } from 'axios';
+import axios, { isCancel, type AxiosRequestConfig } from 'axios';
 import type { HTTPError, HTTPErrorData, HTTPResponseData } from '~~/types/http';
 
 export type ServiceNames = 'casava' | 'smedan';

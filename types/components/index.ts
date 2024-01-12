@@ -17,22 +17,18 @@ export interface DataListItem {
 }
 
 export interface DropdownProvision {
-  uiID: string;
-
-  index: Ref<number>;
+  index: Ref<number | null>;
   isOpen: Ref<boolean>;
-  coordinates?: Ref<DOMRect | null>;
-  updateCoordinates: (value: DOMRect) => void;
 
-  close: () => void;
-  open: () => void;
-  toggle: () => void;
+  close?: () => void;
+  open?: () => void;
+  toggle?: () => void;
 
-  next?: () => void;
-  prev?: () => void;
+  next: () => void;
+  prev: () => void;
   select?: () => void;
 
-  keyDown: (event: KeyboardEvent) => void;
+  keyDown?: (event: KeyboardEvent) => void;
 }
 
 export interface TabsProvision {
