@@ -8,9 +8,7 @@ definePageMeta({
   },
 });
 
-useHead({
-  title: 'Business Today',
-});
+useHead({ title: 'Business Today' });
 
 const yesterday = new Date();
 yesterday.setDate(yesterday.getDate() - 1);
@@ -60,8 +58,6 @@ const sections = computed<
   const totalSignupsYesterday =
     Number(yesterdayD2cStats.data.value?.data?.total_signups ?? 0) +
     Number(yesterdaySmedanStats.data.value?.data?.total_signup ?? 0);
-
-  console.log({ totalPoliciesToday, totalPoliciesYesterday });
 
   const signupsGrowth = ((totalSignupsToday - totalSignupsYesterday) / totalSignupsYesterday);
   const leadsGrowth = ((totalLeadsToday - totalLeadsYesterday) / totalLeadsYesterday);

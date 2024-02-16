@@ -8,14 +8,13 @@ const props = defineProps<{
 
 const { sort, setSorting } = inject<DatatableProvision>('datatable')!;
 const isSorted = computed(() => sort.value.column === props.name);
-const icon = computed(() => {
-  if (!isSorted.value) return 'sort';
-  if (sort.value.orderByAscending) return 'sort-up';
-  return 'sort-down';
-});
-const handleClick = () => {
-  if (props.name) setSorting(props.name);
-};
+const isSortedByAscending = computed(
+  () => isSorted.value && sort.value.orderByAscending
+);
+const isSortedByDescending = computed(
+  () => isSorted.value && !sort.value.orderByAscending
+);
+const handleClick = () => props.name && setSorting(props.name);
 </script>
 
 <template>
@@ -27,12 +26,16 @@ const handleClick = () => {
   >
     <span class="inline-flex gap-4 items-center">
       <span><slot /></span>
-      <span
-        v-if="name"
-        class="inline-flex items-center text-xs"
-        :class="!isSorted && 'text-gray-100'"
-      >
-        <FontAwesomeIcon :icon="icon" />
+      <span v-if="name" class="inline-flex flex-col items-center text-xs">
+        <FontAwesomeIcon
+          icon="sort-up"
+          :class="{ 'opacity-25': !isSortedByAscending }"
+        />
+        <FontAwesomeIcon
+          icon="sort-down"
+          class="-mt-3"
+          :class="{ 'opacity-25': !isSortedByDescending }"
+        />
       </span>
     </span>
   </th>

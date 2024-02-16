@@ -49,8 +49,8 @@ defineExpose({ updatePosition });
   <div class="inline" ref="referenceRef">
     <slot />
     <Teleport to="body">
-      <div class="inline" ref="popperRef" :style="{ zIndex }">
-        <slot name="popper" />
+      <div class="inline w-0 h-0" ref="popperRef" :style="{ zIndex }">
+        <slot name="popper" class="pointer-events-auto" />
       </div>
     </Teleport>
   </div>

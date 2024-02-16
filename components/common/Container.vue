@@ -7,7 +7,7 @@ defineProps<{
 
 <template>
   <section
-    class="max-w-[1140px] mx-auto px-6"
+    class="max-w-[1140px] mx-auto px-3 md:px-6"
     :class="{
       'max-w-[1140px]': !flushX,
       'py-12': !flushY,

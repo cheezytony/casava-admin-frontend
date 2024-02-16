@@ -26,6 +26,10 @@ const links: Array<{ title: string; href: string; exact?: boolean }> = [
     title: 'Finance',
     href: '/finance',
   },
+  {
+    title: 'Customers',
+    href: '/customers',
+  },
 ];
 const logout = async () => {
   await signOut({ callbackUrl: '/login' });
@@ -48,7 +52,7 @@ const isActive = (link: { href: string; exact?: boolean }) => {
     <Container class="flex gap-6 h-20 items-center md:gap-16" flush-y>
       <NuxtLink class="font-light inline-flex flex-col text-2xl" href="/dashboard">
         <LogoDefault />
-        <span class="text-xs font-bold font-mono text-pink-500">Admin</span>
+        <span class="text-xs font-bold font-mono text-pink-500">Analytics</span>
       </NuxtLink>
       <ul class="flex-grow flex flex-row gap-8">
         <template v-for="(link, index) in links" :key="index">
@@ -77,6 +81,7 @@ const isActive = (link: { href: string; exact?: boolean }) => {
           color-scheme="pink"
           size="sm"
           is-rounded
+          right-icon="arrow-right-from-bracket"
           @click="logout"
         >
           <span>{{ session?.user?.name?.at(0) }}.</span>

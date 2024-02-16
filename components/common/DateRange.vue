@@ -105,7 +105,7 @@ const setEndDate = (newEndDate: string | null) => {
         </Button>
       </template>
       <template #items="{ close }">
-        <div id="something" class="min-w-[16rem]">
+        <div>
           <DropdownItem
             v-for="item in ranges"
             :key="item.value"

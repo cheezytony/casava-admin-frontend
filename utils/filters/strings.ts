@@ -32,6 +32,10 @@ export const snakeCase = (string: string) => {
   return breakString(string).join('_');
 };
 
+export const ucFirst = (string: string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1, string.length);
+};
+
 export const sentenceCase = (string: string) => {
   return breakString(string)
     .map((word: string, index) => {
@@ -49,10 +53,6 @@ export const titleCase = (string: string) => {
 export const uppercase = (string: string) => string?.toUpperCase();
 
 export const lowercase = (string: string) => string?.toLowerCase();
-
-export const ucFirst = (string: string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1, string.length);
-};
 
 export const truncate = (string: string, length = 30, after = '...') => {
   if (string.length <= length) return string;

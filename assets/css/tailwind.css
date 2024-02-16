@@ -25,6 +25,7 @@
   display: block;
   font-size: var(--tw-input-font-size);
   height: var(--tw-input-height);
+  max-width: 100%;
   padding: var(--tw-input-padding-y) var(--tw-input-padding-x);
   transition-duration: 300ms;
   width: var(--tw-input-width);
@@ -73,7 +74,7 @@
 .input:hover {
   --tw-input-ring-color: theme(colors.pink.300);
 }
-.input:focus, .input:focus-within {
+.input:is(:focus, :focus-within, .input-focus, .input-focus-within) {
   --tw-input-ring-color: theme(colors.pink.500);
   outline: none;
 }
@@ -93,12 +94,6 @@
 .input[readonly] {
   --tw-input-background-color: theme(colors.gray.100);
 }
-select.input {
-  appearance: none;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  background-position: right 0.75rem center;
-  background-repeat: no-repeat;
-  background-size: 0.5rem 0.5rem;
-  padding-right: calc(var(--tw-input-padding-x) + 1rem);
+.input.select-input {
+  display: flex;
 }

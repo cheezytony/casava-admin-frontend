@@ -81,7 +81,7 @@ const is = computed(() => {
     :is="is"
     :disabled="isLoading || disabled"
     v-bind="attrs"
-    class="duration-300 inline-flex items-center justify-center tracking-[1px] transform active:scale-90 uppercase"
+    class="duration-300 inline-flex items-center justify-center tracking-[1px] transform focus-within:outline-pink-500 active:scale-90 uppercase"
     :class="[
       box,
       color,

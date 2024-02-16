@@ -1,41 +1,28 @@
 export type HTTPResponse<APIResource = any> = {
   data?: APIResource;
-  meta?: {
-    lastPage: number;
-    limit: number;
-    next?: number;
-    page: number;
-    prev?: number;
-    search_column: string;
-    search_value: string;
-    size: number;
-    sort_order: 'asc' | 'desc';
-    total: number;
-  };
   message?: string;
   status: number;
   statusText: string;
 };
 export type HTTPResponseData<APIResource = any> = HTTPResponse<APIResource>;
 
-export type HTTPResourceResponse<APIResource> = {
+export type HTTPPaginatedResponse<APIResource> = {
+  success: boolean;
   data?: {
-    message: string;
-    success: boolean;
     data: APIResource[];
-    metadata: {
-      chunk_count: number;
-      limit: number;
-      order?: string;
-      page: number;
-      page_count: number;
-      query: string;
-      total_count: number;
+    meta: {
+      current_page: number;
+      from: number;
+      last_page: number;
+      path: string;
+      per_page: number;
+      to: number;
+      total: number;
     };
   };
 };
-export type HTTPResourceResponseData<APIResource = any> =
-  HTTPResourceResponse<APIResource>['data'];
+export type HTTPPaginatedResponseData<APIResource = any> =
+  HTTPPaginatedResponse<APIResource>['data'];
 
 export type HTTPError = {
   response?: HTTPResponse;

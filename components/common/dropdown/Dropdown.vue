@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { NuxtLink } from '#components';
 import type { Placement } from '@popperjs/core';
-import { v4 } from 'uuid';
 import type { DropdownProvision } from '~/types';
 
 export interface DropdownItem {
@@ -131,7 +129,7 @@ provide<DropdownProvision>('dropdown', { isOpen, index, next, prev });
     <Popper :placement="placement" z-index="1099">
       <template #default>
         <div
-          class="inline"
+          class="inline outline-none"
           data-ui-type="dropdown"
           tabindex="0"
           ref="triggerRef"
@@ -144,9 +142,9 @@ provide<DropdownProvision>('dropdown', { isOpen, index, next, prev });
       <template #popper>
         <div
           ref="menuRef"
-          class="bg-white duration-300 pointer-events-auto rounded-md shadow-lg ring-1 ring-black ring-opacity-5"
+          class="bg-white duration-300 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 min-w-[12rem]"
           :class="{
-            'opacity-0 pointer-events-none invisible': !isOpen,
+            'opacity-0 pointer-events-none invisible translate-y-4': !isOpen,
           }"
           data-ui-type="dropdown-menu"
         >

@@ -1,6 +1,7 @@
 <script lang="ts" setup generic="TModel extends Record<string, any>">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ref } from 'vue';
+import type { HTTPPaginatedResponse } from '~/types';
+import { useReactiveApi } from '~/utils/hooks/api-reactive';
 import type {
   DatatableProvision,
   DataTableSearch,
@@ -10,7 +11,14 @@ import type {
   DatatableSort,
   DatatableItem,
 } from '~~/types/components';
-import { useApiRequest } from '~~/utils/hooks/api';
+import type { ServiceNames } from '~~/utils/hooks/api';
+
+interface Filter {
+  name: string;
+  label: string;
+  type: 'number' | 'string' | 'select' | 'json' | 'date';
+  options?: Array<{ value: string; label: string }>;
+}
 
 defineExpose();
 const emit = defineEmits<{
@@ -40,6 +48,7 @@ const props = withDefaults(
     searchKey?: string;
     selection?: TModel[];
     selectable?: boolean;
+    service?: ServiceNames;
     showSearchColumns?: boolean;
     uniqueKey?: string;
     url?: string;
@@ -63,8 +72,16 @@ const props = withDefaults(
   }
 );
 
-const router = useRouter();
-const route = useRoute();
+const windowWidth = ref(0);
+const isSmallScreen = computed(() => windowWidth.value < 768);
+const handleResize = () => (windowWidth.value = window.innerWidth);
+onMounted(() => {
+  windowWidth.value = window.innerWidth;
+  window.addEventListener('resize', handleResize);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+});
 const mode = computed(() => (props.url ? 'server' : 'local'));
 
 // ========================================================================================================================
@@ -83,7 +100,7 @@ const paginationLinks = computed(() => {
   const links = [];
 
   // Set default maxLinks
-  const maxLinks = Math.min(3, meta.pages);
+  const maxLinks = Math.min(isSmallScreen.value ? 1 : 3, meta.pages);
 
   // Calculate start and end links considering the maxLinks
   let start = meta.page - Math.floor(maxLinks / 2);
@@ -169,6 +186,31 @@ watch([() => props.limit, () => props.page], ([limit, page]) => {
 // Sorting.
 // ========================================================================================================================
 
+const filterValues = ref(
+  props.filters.reduce(
+    (obj, filter) => ({ ...obj, [filter.slug]: filter.defaultValue ?? '' }),
+    {} as Record<string, string | number | null>
+  )
+);
+const updateFilterValue = (slug: string, value: string | number | null) => {
+  filterValues.value[slug] = value;
+  if (mode.value === 'server') navigate(1);
+};
+watch(
+  () => props.filters,
+  (filters) => {
+    filterValues.value = filters.reduce(
+      (obj, filter) => ({ ...obj, [filter.slug]: filter.defaultValue ?? '' }),
+      filterValues.value
+    );
+  }
+);
+// ========================================================================================================================
+
+// ========================================================================================================================
+// Sorting.
+// ========================================================================================================================
+
 const sort = reactive<DatatableSort>({
   column: props.orderBy,
   orderByAscending: props.orderByAscending,
@@ -219,12 +261,16 @@ const setSearchColumn = (column: string) => {
   emit('update:searchColumn', (search.column = column));
 };
 const resetOnServer = () => {
+  if (!props.url) return;
+
   meta.page = 1;
   search.key = '';
   search.column = searchColumnNames.value[0];
   loadFromServer();
 };
 const searchOnServer = () => {
+  if (!props.url) return;
+
   meta.page = 1;
   loadFromServer();
 };
@@ -238,29 +284,7 @@ watch(
 // ========================================================================================================================
 
 // ========================================================================================================================
-// Filtering
-// ========================================================================================================================
-
-const activeFilters = computed(() => {
-  return props.filters.filter(({ name }) => props.activeFilters.includes(name));
-});
-const isFilterApplied = (filterName: string) => {
-  return props.activeFilters.includes(filterName);
-};
-const toggleFilter = (filterName: string) => {
-  let activeFilters = [...props.activeFilters];
-  ((index: number) => {
-    index > -1
-      ? activeFilters.splice(index, 1)
-      : activeFilters.push(filterName);
-  })(activeFilters.indexOf(filterName));
-
-  emit('update:activeFilters', activeFilters);
-};
-// ========================================================================================================================
-
-// ========================================================================================================================
-//
+// Selecting
 // ========================================================================================================================
 const selection = ref(props.selection ?? []) as Ref<TModel[]>;
 // const isAllSelected = computed(() => {
@@ -313,14 +337,6 @@ const localSearch = (items: TModel[]) => {
     });
   });
 };
-const localFilter = (items: TModel[]) => {
-  if (!activeFilters.value.length) return items;
-  return items.filter((item) => {
-    return activeFilters.value.every((filter) => {
-      return filter.action ? filter.action(item) : true;
-    });
-  });
-};
 const localSort = (items: TModel[]) => {
   if (!sort.column) return items;
   const column = sort.column;
@@ -339,7 +355,7 @@ const localSort = (items: TModel[]) => {
   });
 };
 const locallyModifiedItems = computed(() => {
-  return localSort(localFilter(localSearch([...localItems.value])));
+  return localSort(localSearch([...localItems.value]));
 });
 const locallyPaginatedItems = computed(() => {
   return locallyModifiedItems.value.slice(start.value, end.value);
@@ -385,30 +401,36 @@ const selectAllFromServer = (state: boolean) => {
 };
 const serverQuery = computed(() => {
   return {
-    search_value: search.key,
-    search_column: search.column,
-    sort_by: sort.column,
-    order: sort.orderByAscending ? 'asc' : 'desc',
+    // search_value: search.key,
+    // search_column: search.column,
+    sort_column: sort.column,
+    sort_order: sort.orderByAscending ? 'asc' : 'desc',
     page: meta.page,
     limit: meta.limit,
+    ...filterValues.value,
   };
 });
-const { isLoading, error, load } = useApiRequest<TModel[]>({
+const { isLoading, error, config, load } = useReactiveApi<
+  TModel[],
+  HTTPPaginatedResponse<TModel>
+>({
   baseURL: props.baseUrl,
   url: props.url ?? '',
   authorize: true,
   autoLoad: false,
   initialLoadingState: false,
   signal: controller.value.signal,
+  service: props.service,
   onSuccess: (response) => {
     if (!response?.data) return;
     const { data } = response;
-    serverItems.value = data || [];
-    const { size, limit, page, lastPage, total } = response.meta!;
-    meta.count = size;
-    meta.limit = limit;
-    meta.page = page;
-    meta.pages = lastPage;
+    serverItems.value = data.data || [];
+    const { from, to, per_page, current_page, last_page, total } =
+      response.data.meta!;
+    meta.count = to - from + 1;
+    meta.limit = per_page;
+    meta.page = current_page;
+    meta.pages = last_page;
     meta.total = total;
   },
 });
@@ -417,11 +439,10 @@ const loadFromServer = async () => {
     controller.value.abort();
     controller.value = new AbortController();
   }
-  await load.value({ params: serverQuery.value });
-  router.replace({
-    path: route.path,
-    query: { ...route.query, ...serverQuery.value },
-  });
+
+  config.value.params = serverQuery.value;
+
+  await load();
 };
 onMounted(() => {
   if (props.url) loadFromServer();
@@ -463,108 +484,92 @@ provide<DatatableProvision>('datatable', {
   loadFromServer,
   selectAll,
   setSorting,
-  toggleFilter,
   toggleSelection,
+
+  filterValues,
+  updateFilterValue,
 });
 </script>
 
 <template>
-  <div class="bg-white border border-pink-100 flex flex-col gap-6 max-w-full px-6 py-4 rounded-xl md:px-8">
+  <div class="flex flex-col gap-6 max-w-full">
     <div v-if="paginatable">
       <div
-        class="flex flex-col gap-4 md:gap-4"
+        class="bg-gray-50 flex flex-wrap gap-4 items-center justify-between px-2 py-4 rounded-t md:gap-10 md:px-4"
       >
-        <div class="flex flex-wrap gap-4 items-center">
-          <div class="flex items-center gap-2">
-            <span class="flex-shrink-0 text-gray-500 text-sm">
-              Items per page:
-            </span>
+        <div class="flex items-center gap-2">
+          <span class="flex-shrink-0 font-medium text-gray-500 text-sm">
+            Items per page:
+          </span>
+          <div class="max-w-[100px]">
             <FormSelect
-              class="input-sm"
+              size="sm"
               :options="limits"
               :model-value="meta.limit"
               @update:model-value="updateLimit"
             />
           </div>
-          <div class="flex flex-wrap gap-2 ml-auto">
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            class="border px-4 py-2 rounded text-sm border-gray-400 hover:bg-gray-100 hover:border-black"
+            :class="[meta.page <= 1 && 'opacity-25 pointer-events-none']"
+            type="button"
+            :disabled="meta.page <= 1"
+            @click.prevent="navigate(meta.page - 1)"
+          >
+            &lt;
+          </button>
+          <template :key="index" v-for="(link, index) in paginationLinks">
+            <span v-if="link === null" class="px-1">...</span>
             <button
-              class="border px-4 py-2 rounded text-sm border-gray-400 hover:bg-gray-100 hover:border-black"
-              :class="[meta.page <= 1 && 'opacity-25 pointer-events-none']"
-              type="button"
-              :disabled="meta.page <= 1"
-              @click.prevent="navigate(meta.page - 1)"
-            >
-              &lt;
-            </button>
-            <template :key="index" v-for="(link, index) in paginationLinks">
-              <span v-if="link === null" class="px-1">...</span>
-              <button
-                v-else
-                class="border px-4 py-2 rounded text-sm"
-                :class="[
-                  meta.page === link
-                    ? 'bg-black border-black text-white'
-                    : 'border-gray-400 hover:bg-gray-100 hover:border-black',
-                ]"
-                type="button"
-                :disabled="meta.page === link"
-                v-html="link"
-                @click.prevent="navigate(link)"
-              />
-            </template>
-            <button
-              class="border px-4 py-2 rounded text-sm border-gray-400 hover:bg-gray-100 hover:border-black"
+              v-else
+              class="border px-4 py-2 rounded text-sm"
               :class="[
-                meta.page >= meta.pages && 'opacity-25 pointer-events-none',
+                meta.page === link
+                  ? 'bg-black border-black text-white'
+                  : 'border-gray-400 hover:bg-gray-100 hover:border-black',
               ]"
               type="button"
-              :disabled="meta.page >= meta.pages"
-              @click.prevent="navigate(meta.page + 1)"
-            >
-              &gt;
-            </button>
-          </div>
-        </div>
-        <div class="flex flex-wrap gap-4 items-center">
-          <div
-            class="bg-pink-500 px-6 py-2 rounded-xl ml-auto text-white md:px-8"
+              :disabled="meta.page === link"
+              v-html="link"
+              @click.prevent="navigate(link)"
+            />
+          </template>
+          <button
+            class="border px-4 py-2 rounded text-sm border-gray-400 hover:bg-gray-100 hover:border-black"
+            :class="[
+              meta.page >= meta.pages && 'opacity-25 pointer-events-none',
+            ]"
+            type="button"
+            :disabled="meta.page >= meta.pages"
+            @click.prevent="navigate(meta.page + 1)"
           >
-            <div class="text-sm">
-              <template v-if="paginatedData.length">
-                Showing {{ start + 1 }} to
-                {{ end > meta.total ? meta.total : end }} of
-                {{ meta.total }}
-              </template>
-              <template v-else-if="isLoading">---</template>
-              <template v-else>0 Records</template>
-            </div>
-          </div>
+            &gt;
+          </button>
+        </div>
+      </div>
+      <div class="bg-white px-2 py-2 rounded-b md:px-4">
+        <div class="font-medium text-gray-500 text-sm">
+          <template v-if="paginatedData.length">
+            Showing {{ start + 1 }} to
+            {{ end > meta.total ? meta.total : end }} of
+            {{ meta.total }}
+          </template>
+          <template v-else>---</template>
         </div>
       </div>
     </div>
     <div
-      v-if="$slots.cta"
+      v-if="$slots.cta || searchable"
       class="flex flex-wrap gap-x-12 gap-y-2 items-center"
     >
       <div v-if="$slots.cta" class="md:ml-auto md:order-3">
         <slot name="cta" />
       </div>
+      <DatatableSearch />
     </div>
-    <DatatableFilter />
-    <!-- <div class="flex gap-4 items-center" v-if="filterable && filters.length">
-      <template v-for="filter in filters">
-        <Tag
-          :is-active="isFilterApplied(filter.name)"
-          :right-icon="isFilterApplied(filter.name) ? 'close' : undefined"
-          @click="toggleFilter(filter.name)"
-        >
-          {{ filter.title || filter.name }}
-        </Tag>
-      </template>
-      <span v-if="selectable" class="font-medium text-gray-400 text-sm">
-        {{ selection.length }} Selected
-      </span>
-    </div> -->
+    <DatatableFilter :filters="filters" />
     <slot
       name="table"
       :error="error"
@@ -580,24 +585,27 @@ provide<DatatableProvision>('datatable', {
       >
         <p>There are no results to display</p>
       </div>
-      <div v-else class="overflow-x-scroll w-full">
-        <table
-          class="border border-gray-100 border-collapse whitespace-nowrap w-full"
-        >
-          <thead>
-            <tr class="bg-gray-50">
-              <DatatableTH v-if="selectable">
-                <FormCheckbox class="mb-0" @update:modelValue="selectAll" />
-              </DatatableTH>
-              <slot name="heading" />
-            </tr>
-          </thead>
-          <tbody>
-            <template v-for="(row, index) in paginatedData">
-              <slot v-bind="getSlotRow({ ...row, loadFromServer })" />
-            </template>
-          </tbody>
-        </table>
+      <div
+        v-else
+        class="border border-gray-100 rounded-xl overflow-x-clip w-full"
+      >
+        <div class="overflow-x-scroll w-full">
+          <table class="border-collapse whitespace-nowrap w-full">
+            <thead>
+              <tr class="bg-gray-50">
+                <DatatableTH v-if="selectable">
+                  <FormCheckbox class="mb-0" @update:modelValue="selectAll" />
+                </DatatableTH>
+                <slot name="heading" />
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="(row, index) in paginatedData">
+                <slot v-bind="{ ...row, loadFromServer }" />
+              </template>
+            </tbody>
+          </table>
+        </div>
       </div>
     </slot>
   </div>

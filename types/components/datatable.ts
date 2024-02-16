@@ -21,8 +21,10 @@ export interface DatatableProvision {
   setSearchColumn: (column: string) => void;
   setSearchKey: (key: string) => void;
   setSorting: (name: string) => void;
-  toggleFilter: (filterName: string) => void;
   toggleSelection: (item: any) => void;
+
+  filterValues: Ref<Record<string, string | number | null>>;
+  updateFilterValue: (key: string, value: string | number) => void;
 }
 
 export interface DatatableItem<TModel = any> {
@@ -49,10 +51,12 @@ export interface DataTableSearch {
 }
 export type DatatableSearchColumn = string | { title: string; name: string };
 export type DatatableFilter = {
-  name: string;
-  title?: string;
-  value?: string;
-  action?: (item: any) => boolean;
+  slug: string;
+  label: string;
+  placeholder?: string;
+  type?: 'text' | 'number' | 'select';
+  options?: Array<{ value?: string | number | null; title?: string }>;
+  defaultValue?: any;
 };
 export type DatatablePaginationLink = {
   isActive?: boolean;

@@ -1,7 +1,7 @@
 <template>
   <table class="">
     <thead>
-      <DatatableRow>
+      <DatatableRow class="bg-gray-50">
         <template v-for="index in 4">
           <DatatableTH :align="index === 4 ? 'right' : 'left'">
             <Skeleton

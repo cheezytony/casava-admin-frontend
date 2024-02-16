@@ -161,9 +161,10 @@ const reload = () => {
 
 const onDateChange = ([startDate, endDate]: [string | null, string | null]) => {
   const params = { start_date: startDate, end_date: endDate };
-  smedanStats.update({ params });
-  d2cStats.update({ params });
-  b2bStats.update({ params });
+
+  smedanStats.config.value.params = params;
+  d2cStats.config.value.params = params;
+  b2bStats.config.value.params = params;
 
   reload();
 };

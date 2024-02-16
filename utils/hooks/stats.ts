@@ -1,6 +1,8 @@
+import { useReactiveApi } from './api-reactive';
+
 export const useSmedanStats = (baseDate?: Date) => {
   const today = (baseDate ?? new Date()).toISOString().split('T')[0];
-  return useApiRequest<{
+  return useReactiveApi<{
     churn_rate: number;
     difference: number;
     total_business_gro_subscribers: number;
@@ -19,7 +21,7 @@ export const useSmedanStats = (baseDate?: Date) => {
 
 export const useD2cStats = (baseDate?: Date) => {
   const today = (baseDate ?? new Date()).toISOString().split('T')[0];
-  return useApiRequest<{
+  return useReactiveApi<{
     total_signups: number;
     total_verified_users: number;
     total_policies_created: number;
@@ -39,7 +41,7 @@ export const useD2cStats = (baseDate?: Date) => {
 
 export const useB2bStats = (baseDate?: Date) => {
   const today = (baseDate ?? new Date()).toISOString().split('T')[0];
-  return useApiRequest<{
+  return useReactiveApi<{
     total_partners: number;
     total_policies_created: number;
     total_partner_premium_payments: number;
@@ -59,7 +61,7 @@ export const useB2bStats = (baseDate?: Date) => {
 
 export const useFinanceStats = (baseDate?: Date) => {
   const today = (baseDate ?? new Date()).toISOString().split('T')[0];
-  return useApiRequest<{
+  return useReactiveApi<{
     total_policies: number;
     total_premium_payments: number;
     total_transactions: number;
